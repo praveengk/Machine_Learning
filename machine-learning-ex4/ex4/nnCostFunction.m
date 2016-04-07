@@ -30,6 +30,54 @@ J = 0;
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
 
+y_matrix = eye(num_labels)(y,:);
+
+a1 = [ones(m, 1) X];
+
+z2 = a1 * Theta1';
+
+a2 = sigmoid(z2);
+
+a2 = [ones(m, 1) a2];
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+
+temp = -y_matrix .* log(a3) - (1 - y_matrix) .* log(1 - a3);
+temp1 = sum(sum(temp))/ m;
+
+theta1_reg = Theta1(:, 2:end);
+theta2_reg = Theta2(:, 2:end);
+
+theta1_reg_sq_sum = sum(sum(theta1_reg.^2));
+theta2_reg_sq_sum = sum(sum(theta2_reg.^2));
+
+temp2 = theta1_reg_sq_sum + theta2_reg_sq_sum;
+J = (lambda / (2 * m)) * temp2 + temp1;
+
+
+d3 = a3 - y_matrix;
+
+size(d3)
+
+d2 = d3*Theta2(:, 2:end).*sigmoidGradient(z2);
+size(d2)
+
+delta1 = d2'*a1;
+
+delta2 = d3'*a2;
+
+Theta1_grad = delta1/m;
+Theta2_grad = delta2/m;
+
+Theta1(:, 1) = 0;
+Theta2(:, 1) = 0;
+
+Theta1 = Theta1 * (lambda / m);
+Theta2 = Theta2 * (lambda / m);
+
+Theta1_grad = Theta1_grad + Theta1;
+Theta2_grad = Theta2_grad + Theta2;
+
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
 %               following parts.
